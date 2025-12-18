@@ -73,7 +73,10 @@ RCT_EXPORT_VIEW_PROPERTY(autoManageStatusBarEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(hideKeyboardAccessoryView, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsBackForwardNavigationGestures, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(incognito, BOOL)
-RCT_EXPORT_VIEW_PROPERTY(profile, NSString)
+RCT_CUSTOM_VIEW_PROPERTY(profile, NSString, RNCWebViewImpl) {
+  view.profile = [RCTConvert NSString: json];
+  NSLog(@"Set profile to %@", [RCTConvert NSString: json]);
+}
 RCT_EXPORT_VIEW_PROPERTY(pagingEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(applicationNameForUserAgent, NSString)
 RCT_EXPORT_VIEW_PROPERTY(cacheEnabled, BOOL)

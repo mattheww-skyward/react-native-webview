@@ -466,14 +466,16 @@ RCTAutoInsetsProtocol>
   }
     // Use profile-specific data store if profile is provided (iOS 17+)
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 170000 /* iOS 17 */
-  if (websiteDataStore == nil && @available(iOS 17.0, macOS 14.0, *)) {
-      NSUUID *profileUUID = [[NSUUID alloc] initWithUUIDString:_profile];
-      if (profileUUID == nil) {
-        NSLog(@"Invalid profile value, should be GUID")
-      } else {
-        websiteDataStore = [WKWebsiteDataStore dataStoreForIdentifier:profileUUID];
-      }
-  }
+    if (@available(iOS 17.0, macOS 14.0, *)) {
+        if (websiteDataStore == nil) {
+            NSUUID *profileUUID = [[NSUUID alloc] initWithUUIDString:_profile];
+            if (profileUUID == nil) {
+                NSLog(@"Invalid profile value, should be GUID");
+            } else {
+                websiteDataStore = [WKWebsiteDataStore dataStoreForIdentifier:profileUUID];
+            }
+        }
+    }
 #endif
   if (websiteDataStore == nil && _cacheEnabled) {
     websiteDataStore = [WKWebsiteDataStore defaultDataStore];
