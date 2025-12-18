@@ -494,7 +494,7 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
         if (profileName != null && WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
             try {
                 // Get or create a profile with the given name and associate it with the WebView
-                val profile = WebViewCompat.setProfile(view, profileName)
+                WebViewCompat.setProfile(view, profileName)
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to set WebView profile: ${e.message}")
             }
