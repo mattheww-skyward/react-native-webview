@@ -469,22 +469,16 @@ RCTAutoInsetsProtocol>
       if (profileUUID != nil) {
         wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore dataStoreForIdentifier:profileUUID];
       } else {
-        // If profile is not a valid UUID, fall back to default or cache-based store
-        if (_cacheEnabled) {
-          wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore defaultDataStore];
-        }
+        // If profile is not a valid UUID, fall back to cache-based behavior
+        wkWebViewConfig.websiteDataStore = _cacheEnabled ? [WKWebsiteDataStore defaultDataStore] : [WKWebsiteDataStore nonPersistentDataStore];
       }
     } else {
-      // Fall back to cacheEnabled behavior on older iOS versions
-      if (_cacheEnabled) {
-        wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore defaultDataStore];
-      }
+      // Fall back to cache-based behavior on older iOS versions
+      wkWebViewConfig.websiteDataStore = _cacheEnabled ? [WKWebsiteDataStore defaultDataStore] : [WKWebsiteDataStore nonPersistentDataStore];
     }
 #else
-    // Fall back to cacheEnabled behavior when iOS 17 is not available
-    if (_cacheEnabled) {
-      wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore defaultDataStore];
-    }
+    // Fall back to cache-based behavior when iOS 17 is not available
+    wkWebViewConfig.websiteDataStore = _cacheEnabled ? [WKWebsiteDataStore defaultDataStore] : [WKWebsiteDataStore nonPersistentDataStore];
 #endif
   } else if (_cacheEnabled) {
     wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore defaultDataStore];
