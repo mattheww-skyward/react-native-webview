@@ -67,6 +67,7 @@ This document lays out the current public properties and methods for the React N
 - [`hideKeyboardAccessoryView`](Reference.md#hidekeyboardaccessoryview)
 - [`allowsBackForwardNavigationGestures`](Reference.md#allowsbackforwardnavigationgestures)
 - [`incognito`](Reference.md#incognito)
+- [`profile`](Reference.md#profile)
 - [`allowFileAccess`](Reference.md#allowFileAccess)
 - [`saveFormDataDisabled`](Reference.md#saveFormDataDisabled)
 - [`cacheEnabled`](Reference.md#cacheEnabled)
@@ -1301,6 +1302,30 @@ Does not store any data within the lifetime of the WebView.
 | Type    | Required | Platform            |
 | ------- | -------- | ------------------- |
 | boolean | No       | iOS, Android, macOS |
+
+---
+
+### `profile`[⬆](#props-index)
+
+A string identifier for the WebView profile, enabling data isolation across separate WebView instances.
+
+On **Android**, this uses `WebViewCompat.setProfile()` to create or associate a named profile with the WebView. This requires AndroidX WebKit library with `MULTI_PROFILE` feature support. Different WebViews with the same profile name will share cookies, cache, and other web data, while WebViews with different profile names will have isolated data stores.
+
+On **iOS** (17.0+) and **macOS** (14.0+), the profile string is parsed as a UUID and used with `WKWebsiteDataStore.dataStoreForIdentifier()`. If the profile is not a valid UUID or the OS version doesn't support profiles, it falls back to cache-based behavior.
+
+**Note:** The `profile` and `incognito` props are mutually exclusive. When `incognito` is `true`, the `profile` prop will be ignored.
+
+Example:
+```javascript
+<WebView 
+  source={{ uri: 'https://example.com' }}
+  profile="550e8400-e29b-41d4-a716-446655440000"
+/>
+```
+
+| Type   | Required | Platform            |
+| ------ | -------- | ------------------- |
+| string | No       | iOS, Android, macOS |
 
 ---
 

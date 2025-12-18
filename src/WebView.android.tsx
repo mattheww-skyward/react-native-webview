@@ -220,6 +220,13 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
       };
     }, [messagingModuleName, onMessage, onShouldStartLoadWithRequest]);
 
+    // Warn if both incognito and profile are used together
+    if (otherProps.incognito && otherProps.profile) {
+      console.warn(
+        'incognito and profile props are mutually exclusive. profile will be ignored when incognito is true.'
+      );
+    }
+
     let otherView: ReactElement | undefined;
     if (viewState === 'LOADING') {
       otherView = (renderLoading || defaultRenderLoading)();

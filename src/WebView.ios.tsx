@@ -85,6 +85,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
       mediaPlaybackRequiresUserAction,
       dataDetectorTypes,
       incognito,
+      profile,
       decelerationRate: decelerationRateProp,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
       ...otherProps
@@ -173,11 +174,19 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
       'allowsAirPlayForMediaPlayback'
     );
     useWarnIfChanges(incognito, 'incognito');
+    useWarnIfChanges(profile, 'profile');
     useWarnIfChanges(
       mediaPlaybackRequiresUserAction,
       'mediaPlaybackRequiresUserAction'
     );
     useWarnIfChanges(dataDetectorTypes, 'dataDetectorTypes');
+
+    // Warn if both incognito and profile are used together
+    if (incognito && profile) {
+      console.warn(
+        'incognito and profile props are mutually exclusive. profile will be ignored when incognito is true.'
+      );
+    }
 
     let otherView = null;
     if (viewState === 'LOADING') {
@@ -271,6 +280,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
           allowsPictureInPictureMediaPlayback
         }
         incognito={incognito}
+        profile={profile}
         mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
         newSource={newSource}
         style={webViewStyles}
