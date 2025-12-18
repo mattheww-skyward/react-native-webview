@@ -459,29 +459,27 @@ RCTAutoInsetsProtocol>
   if (_prefsUsed) {
     wkWebViewConfig.preferences = prefs;
   }
+  WKWebsiteDataStore *websiteDataStore;
+
   if (_incognito) {
-    wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
-  } else if (_profile != nil) {
+    websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
+  }
     // Use profile-specific data store if profile is provided (iOS 17+)
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 170000 /* iOS 17 */
-    if (@available(iOS 17.0, macOS 14.0, *)) {
+  if (websiteDataStore == nil && @available(iOS 17.0, macOS 14.0, *)) {
       NSUUID *profileUUID = [[NSUUID alloc] initWithUUIDString:_profile];
-      if (profileUUID != nil) {
-        wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore dataStoreForIdentifier:profileUUID];
+      if (profileUUID == nil) {
+        NSLog(@"Invalid profile value, should be GUID")
       } else {
-        // If profile is not a valid UUID, fall back to cache-based behavior
-        wkWebViewConfig.websiteDataStore = _cacheEnabled ? [WKWebsiteDataStore defaultDataStore] : [WKWebsiteDataStore nonPersistentDataStore];
+        websiteDataStore = [WKWebsiteDataStore dataStoreForIdentifier:profileUUID];
       }
-    } else {
-      // Fall back to cache-based behavior on older iOS versions
-      wkWebViewConfig.websiteDataStore = _cacheEnabled ? [WKWebsiteDataStore defaultDataStore] : [WKWebsiteDataStore nonPersistentDataStore];
-    }
-#else
-    // Fall back to cache-based behavior when iOS 17 is not available
-    wkWebViewConfig.websiteDataStore = _cacheEnabled ? [WKWebsiteDataStore defaultDataStore] : [WKWebsiteDataStore nonPersistentDataStore];
+  }
 #endif
-  } else if (_cacheEnabled) {
-    wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore defaultDataStore];
+  if (websiteDataStore == nil && _cacheEnabled) {
+    websiteDataStore = [WKWebsiteDataStore defaultDataStore];
+  }
+  if (websiteDataStore != nil) {
+    wkWebViewConfig.websiteDataStore = websiteDataStore;
   }
   if(self.useSharedProcessPool) {
     wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];
