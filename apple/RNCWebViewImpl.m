@@ -470,8 +470,9 @@ RCTAutoInsetsProtocol>
         if (websiteDataStore == nil) {
             NSUUID *profileUUID = [[NSUUID alloc] initWithUUIDString:_profile];
             if (profileUUID == nil) {
-                NSLog(@"Invalid profile value, should be GUID");
+                NSLog(@"Invalid profile value %@, should be GUID", _profile);
             } else {
+                NSLog(@"Setting profile to %@", _profile);
                 websiteDataStore = [WKWebsiteDataStore dataStoreForIdentifier:profileUUID];
             }
         }
