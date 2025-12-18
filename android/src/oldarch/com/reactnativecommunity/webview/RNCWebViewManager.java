@@ -127,6 +127,11 @@ public class RNCWebViewManager extends ViewGroupManager<RNCWebViewWrapper> {
         mRNCWebViewManagerImpl.setIncognito(view, value);
     }
 
+    @ReactProp(name = "profile")
+    public void setProfile(RNCWebViewWrapper view, @Nullable String value) {
+        mRNCWebViewManagerImpl.setProfile(view, value);
+    }
+
     @ReactProp(name = "injectedJavaScript")
     public void setInjectedJavaScript(RNCWebViewWrapper view, @Nullable String value) {
         mRNCWebViewManagerImpl.setInjectedJavaScript(view, value);

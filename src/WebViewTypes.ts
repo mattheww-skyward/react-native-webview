@@ -290,6 +290,13 @@ export interface BasicAuthCredential {
 export interface CommonNativeWebViewProps extends ViewProps {
   cacheEnabled?: boolean;
   incognito?: boolean;
+  /**
+   * A string identifier for the WebView profile.
+   * On Android, this uses WebViewCompat.setProfile() to set a named profile.
+   * On iOS, this is parsed as a GUID and uses WKWebsiteDataStore.dataStoreForIdentifier().
+   * @platform android, ios
+   */
+  profile?: string;
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;
   injectedJavaScriptForMainFrameOnly?: boolean;

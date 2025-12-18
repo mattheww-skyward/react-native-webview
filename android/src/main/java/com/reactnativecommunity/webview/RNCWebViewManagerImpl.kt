@@ -16,6 +16,7 @@ import android.webkit.DownloadListener
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
@@ -485,6 +486,19 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
         view.clearFormData();
         view.settings.savePassword = false;
         view.settings.saveFormData = false;
+    }
+
+    fun setProfile(viewWrapper: RNCWebViewWrapper, profileName: String?) {
+        val view = viewWrapper.webView
+        // Only set profile if the feature is available and profileName is provided
+        if (profileName != null && WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+            try {
+                val profile = WebViewCompat.getProfile(view, profileName)
+                WebViewCompat.setProfile(view, profile.name)
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to set WebView profile: ${e.message}")
+            }
+        }
     }
 
     fun setInjectedJavaScript(viewWrapper: RNCWebViewWrapper, injectedJavaScript: String?) {

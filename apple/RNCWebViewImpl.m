@@ -461,6 +461,31 @@ RCTAutoInsetsProtocol>
   }
   if (_incognito) {
     wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
+  } else if (_profile != nil) {
+    // Use profile-specific data store if profile is provided (iOS 17+)
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 170000 /* iOS 17 */
+    if (@available(iOS 17.0, macOS 14.0, *)) {
+      NSUUID *profileUUID = [[NSUUID alloc] initWithUUIDString:_profile];
+      if (profileUUID != nil) {
+        wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore dataStoreForIdentifier:profileUUID];
+      } else {
+        // If profile is not a valid UUID, fall back to default or cache-based store
+        if (_cacheEnabled) {
+          wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore defaultDataStore];
+        }
+      }
+    } else {
+      // Fall back to cacheEnabled behavior on older iOS versions
+      if (_cacheEnabled) {
+        wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore defaultDataStore];
+      }
+    }
+#else
+    // Fall back to cacheEnabled behavior when iOS 17 is not available
+    if (_cacheEnabled) {
+      wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore defaultDataStore];
+    }
+#endif
   } else if (_cacheEnabled) {
     wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore defaultDataStore];
   }
