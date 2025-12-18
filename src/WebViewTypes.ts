@@ -292,7 +292,7 @@ export interface CommonNativeWebViewProps extends ViewProps {
   incognito?: boolean;
   /**
    * A string identifier for the WebView profile.
-   * On Android, this uses WebViewCompat.setProfile() to set a named profile.
+   * On Android, this uses WebViewCompat.getProfile() to get or create a named profile.
    * On iOS, this is parsed as a GUID and uses WKWebsiteDataStore.dataStoreForIdentifier().
    * @platform android, ios
    */
