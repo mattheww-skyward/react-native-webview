@@ -499,7 +499,12 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
                 Log.w(TAG, "Failed to set WebView profile: ${e.message}")
             }
         } else {
-          Log.w(TAG, "WebView profiles not supported")
+            if (profileName == null) {
+                Log.w(TAG, "WebView profile not set: profileName is null")
+            }
+            if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+                Log.w(TAG, "WebView profiles not supported on this device")
+            }
         }
     }
 
