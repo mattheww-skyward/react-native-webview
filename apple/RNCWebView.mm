@@ -289,6 +289,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_PROP(hideKeyboardAccessoryView)
     REMAP_WEBVIEW_PROP(allowsBackForwardNavigationGestures)
     REMAP_WEBVIEW_PROP(incognito)
+    REMAP_WEBVIEW_STRING_PROP(profile)
     REMAP_WEBVIEW_PROP(pagingEnabled)
     REMAP_WEBVIEW_STRING_PROP(applicationNameForUserAgent)
     REMAP_WEBVIEW_PROP(cacheEnabled)
