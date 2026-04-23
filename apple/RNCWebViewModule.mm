@@ -1,3 +1,5 @@
+#import <React/RCTBridgeModule.h>
+#import "RNCWebsiteDataStoreManager.h"
 #import "RNCWebViewModule.h"
 
 #import "RNCWebViewDecisionManager.h"
@@ -10,10 +12,22 @@
 
 RCT_EXPORT_MODULE(RNCWebViewModule)
 
-RCT_EXPORT_METHOD(isFileUploadSupported:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-    if (resolve) {
-        resolve(@(YES));
+
+RCT_EXPORT_METHOD(flushCookies:(NSString *)profile resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+{
+  [RNCWebsiteDataStoreManager flushCookiesForProfile:profile completion:^(NSError * _Nullable err) {
+    if (err) {
+      reject(@"flush_error", @"Failed to flush cookies", err);
+    } else {
+      resolve(@(YES));
     }
+  }];
+}
+
+RCT_EXPORT_METHOD(isFileUploadSupported:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  if (resolve) {
+    resolve(@(YES));
+  }
 }
 
 RCT_EXPORT_METHOD(shouldStartLoadWithLockIdentifier:(BOOL)shouldStart lockIdentifier:(double)lockIdentifier)

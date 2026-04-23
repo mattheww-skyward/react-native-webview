@@ -8,6 +8,7 @@
 #import "RNCWebViewImpl.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
+#import "RNCWebsiteDataStoreManager.h"
 #import "RNCWKProcessPoolManager.h"
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
@@ -477,7 +478,7 @@ RCTAutoInsetsProtocol>
 #ifdef DEBUG
                 NSLog(@"Setting profile to %@", _profile);
 #endif
-                websiteDataStore = [WKWebsiteDataStore dataStoreForIdentifier:profileUUID];
+                websiteDataStore = [RNCWebsiteDataStoreManager dataStoreForProfileUUID:profileUUID];
             }
         }
     }

@@ -53,17 +53,17 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 #endif // !TARGET_OS_OSX
 
 
-@property (nonatomic, copy) RCTDirectEventBlock onFileDownload;
-@property (nonatomic, copy) RCTDirectEventBlock onLoadingStart;
-@property (nonatomic, copy) RCTDirectEventBlock onLoadingFinish;
-@property (nonatomic, copy) RCTDirectEventBlock onLoadingError;
-@property (nonatomic, copy) RCTDirectEventBlock onLoadingProgress;
-@property (nonatomic, copy) RCTDirectEventBlock onShouldStartLoadWithRequest;
-@property (nonatomic, copy) RCTDirectEventBlock onHttpError;
-@property (nonatomic, copy) RCTDirectEventBlock onMessage;
-@property (nonatomic, copy) RCTDirectEventBlock onScroll;
-@property (nonatomic, copy) RCTDirectEventBlock onContentProcessDidTerminate;
-@property (nonatomic, copy) RCTDirectEventBlock onOpenWindow;
+@property (nonatomic, copy) RCTDirectEventBlock _Nullable onFileDownload;
+@property (nonatomic, copy) RCTDirectEventBlock _Nullable onLoadingStart;
+@property (nonatomic, copy) RCTDirectEventBlock _Nullable onLoadingFinish;
+@property (nonatomic, copy) RCTDirectEventBlock _Nullable onLoadingError;
+@property (nonatomic, copy) RCTDirectEventBlock _Nullable onLoadingProgress;
+@property (nonatomic, copy) RCTDirectEventBlock _Nullable onShouldStartLoadWithRequest;
+@property (nonatomic, copy) RCTDirectEventBlock _Nullable onHttpError;
+@property (nonatomic, copy) RCTDirectEventBlock _Nullable onMessage;
+@property (nonatomic, copy) RCTDirectEventBlock _Nullable onScroll;
+@property (nonatomic, copy) RCTDirectEventBlock _Nullable onContentProcessDidTerminate;
+@property (nonatomic, copy) RCTDirectEventBlock _Nullable onOpenWindow;
 
 
 @property (nonatomic, weak) id<RNCWebViewDelegate> _Nullable delegate;
