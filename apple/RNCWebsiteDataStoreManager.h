@@ -9,6 +9,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)flushCookiesForProfile:(NSString * _Nullable)profile completion:(void(^)(NSError * _Nullable))completion;
 
++ (void)removeDataStoreForProfile:(NSString * _Nullable)profile completion:(void(^ _Nullable)(NSError * _Nullable))completion;
+
 @end
 
 NS_ASSUME_NONNULL_END
