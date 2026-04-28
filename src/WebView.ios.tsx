@@ -88,6 +88,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
       profile,
       decelerationRate: decelerationRateProp,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
+      removeIosKeyboardObserver,
       ...otherProps
     },
     ref
@@ -180,6 +181,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
       'mediaPlaybackRequiresUserAction'
     );
     useWarnIfChanges(dataDetectorTypes, 'dataDetectorTypes');
+    useWarnIfChanges(removeIosKeyboardObserver, 'removeIosKeyboardObserver');
 
     // Warn if both incognito and profile are used together
     if (incognito && profile) {
@@ -282,6 +284,7 @@ const WebViewComponent = forwardRef<{}, IOSWebViewProps>(
         incognito={incognito}
         profile={profile}
         mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
+        removeIosKeyboardObserver={removeIosKeyboardObserver}
         newSource={newSource}
         style={webViewStyles}
         hasOnFileDownload={!!onFileDownload}
