@@ -49,16 +49,15 @@
 }
 
 + (void)removeDataStoreForProfile:(NSString *)profile completion:(void(^)(NSError * _Nullable))completion {
-    NSLog(@"[RNCWebsiteDataStoreManager][removeDataStoreForProfile] called with profile.");
     if (!profile.length) {
         if (completion) {
             completion([NSError errorWithDomain:@"RNCWebsiteDataStoreManager"
                                            code:1
                                        userInfo:@{NSLocalizedDescriptionKey: @"Missing profile identifier"}]);
         }
-        NSLog(@"[RNCWebsiteDataStoreManager][removeDataStoreForProfile] missing profile identifier");
         return;
     }
+
     NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:profile];
     if (!uuid) {
         if (completion) {
@@ -66,28 +65,19 @@
                                            code:2
                                        userInfo:@{NSLocalizedDescriptionKey: @"Invalid profile UUID"}]);
         }
-        NSLog(@"[RNCWebsiteDataStoreManager][removeDataStoreForProfile] invalid profile UUID");
         return;
     }
 
     NSString *key = uuid.UUIDString;
-    NSLog(@"[RNCWebsiteDataStoreManager][removeDataStoreForProfile] starting removal for key.");
     WKWebsiteDataStore *store = [self dataStoreForProfileUUID:uuid];
-    NSLog(@"[RNCWebsiteDataStoreManager][removeDataStoreForProfile] obtained store.");
     NSSet *allTypes = [WKWebsiteDataStore allWebsiteDataTypes];
-    NSLog(@"[RNCWebsiteDataStoreManager][removeDataStoreForProfile] all data types.");
     NSDate *epoch = [NSDate distantPast];
-    NSLog(@"[RNCWebsiteDataStoreManager][removeDataStoreForProfile] epoch.");
-
-    NSLog(@"[RNCWebsiteDataStoreManager][removeDataStoreForProfile] starting removal for key: %@, store: %@, types: %@, modifiedSince: %@", key, store, allTypes, epoch);
 
     [store removeDataOfTypes:allTypes modifiedSince:epoch completionHandler:^{
-        NSLog(@"[RNCWebsiteDataStoreManager][removeDataStoreForProfile] removeDataOfTypes completion handler called for key: %@", key);
         dispatch_async([self cacheQueue], ^{
-            NSLog(@"[RNCWebsiteDataStoreManager][removeDataStoreForProfile] removing cache entry for key: %@", key);
             [[self cache] removeObjectForKey:key];
+            if (completion) completion(nil);
         });
-        if (completion) completion(nil);
     }];
 }
 
