@@ -326,37 +326,27 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
 
 #if !TARGET_OS_OSX
     if (oldViewProps.dataDetectorTypes != newViewProps.dataDetectorTypes) {
-        using Mask = RNCWebViewDataDetectorTypesMask;
-        Mask mask = newViewProps.dataDetectorTypes;
-        WKDataDetectorTypes wkDataDetectorTypes = WKDataDetectorTypeNone;
-        if (mask & RNCWebViewDataDetectorTypes::Address) {
-            wkDataDetectorTypes |= WKDataDetectorTypeAddress;
+        WKDataDetectorTypes dataDetectorTypes = WKDataDetectorTypeNone;
+            if (dataDetectorTypes & RNCWebViewDataDetectorTypes::Address) {
+                dataDetectorTypes |= WKDataDetectorTypeAddress;
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::Link) {
+                dataDetectorTypes |= WKDataDetectorTypeLink;
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::CalendarEvent) {
+                dataDetectorTypes |= WKDataDetectorTypeCalendarEvent;
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::TrackingNumber) {
+                dataDetectorTypes |= WKDataDetectorTypeTrackingNumber;
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::FlightNumber) {
+                dataDetectorTypes |= WKDataDetectorTypeFlightNumber;
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::LookupSuggestion) {
+                dataDetectorTypes |= WKDataDetectorTypeLookupSuggestion;
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::PhoneNumber) {
+                dataDetectorTypes |= WKDataDetectorTypePhoneNumber;
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::All) {
+                dataDetectorTypes |= WKDataDetectorTypeAll;
+            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::None) {
+                dataDetectorTypes = WKDataDetectorTypeNone;
         }
-        if (mask & RNCWebViewDataDetectorTypes::Link) {
-            wkDataDetectorTypes |= WKDataDetectorTypeLink;
-        }
-        if (mask & RNCWebViewDataDetectorTypes::CalendarEvent) {
-            wkDataDetectorTypes |= WKDataDetectorTypeCalendarEvent;
-        }
-        if (mask & RNCWebViewDataDetectorTypes::TrackingNumber) {
-            wkDataDetectorTypes |= WKDataDetectorTypeTrackingNumber;
-        }
-        if (mask & RNCWebViewDataDetectorTypes::FlightNumber) {
-            wkDataDetectorTypes |= WKDataDetectorTypeFlightNumber;
-        }
-        if (mask & RNCWebViewDataDetectorTypes::LookupSuggestion) {
-            wkDataDetectorTypes |= WKDataDetectorTypeLookupSuggestion;
-        }
-        if (mask & RNCWebViewDataDetectorTypes::PhoneNumber) {
-            wkDataDetectorTypes |= WKDataDetectorTypePhoneNumber;
-        }
-        if (mask & RNCWebViewDataDetectorTypes::All) {
-            wkDataDetectorTypes |= WKDataDetectorTypeAll;
-        }
-        if (mask & RNCWebViewDataDetectorTypes::None) {
-            wkDataDetectorTypes = WKDataDetectorTypeNone;
-        }
-        [_view setDataDetectorTypes:wkDataDetectorTypes];
+        [_view setDataDetectorTypes:dataDetectorTypes];
     }
 #endif // !TARGET_OS_OSX
 
