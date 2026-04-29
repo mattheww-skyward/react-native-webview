@@ -1,6 +1,10 @@
 #import "RNCWebsiteDataStoreManager.h"
 
 @implementation RNCWebsiteDataStoreManager
+/*
+ Hold references to per-profile `WKWebsiteDataStore` instances in a 
+ cache so the same store instance is reused across WebViews. This avoids races.
+*/
 
 + (NSMutableDictionary<NSString *, WKWebsiteDataStore *> *)cache {
     static NSMutableDictionary *dict = nil;
@@ -21,31 +25,31 @@
 }
 
 + (WKWebsiteDataStore *)dataStoreForProfileUUID:(NSUUID *)uuid {
+    /*
+     Return the profile-specific `WKWebsiteDataStore` when available (iOS 17+/macOS 14+).
+     Synchronously access the cache on `cacheQueue` to avoid races. 
+    */
     if (!uuid) {
         return [WKWebsiteDataStore defaultDataStore];
     }
 
     if (@available(iOS 17.0, macOS 14.0, *)) {
-        // Handled below with caching.
-    } else {
-        return [WKWebsiteDataStore dataStoreForIdentifier:uuid];
-    }
-
-    NSString *key = uuid.UUIDString;
-    __block WKWebsiteDataStore *result = nil;
-    dispatch_sync([self cacheQueue], ^{
-        NSMutableDictionary *cache = [self cache];
-        result = cache[key];
-        if (!result) {
-            if (@available(iOS 17.0, macOS 14.0, *)) {
+        NSString *key = uuid.UUIDString;
+        __block WKWebsiteDataStore *result = nil;
+        dispatch_sync([self cacheQueue], ^{
+            NSMutableDictionary *cache = [self cache];
+            result = cache[key];
+            if (!result) {
                 result = [WKWebsiteDataStore dataStoreForIdentifier:uuid];
                 if (result) {
                     cache[key] = result;
                 }
             }
-        }
-    });
-    return result;
+        });
+        return result;
+    }
+
+    return [WKWebsiteDataStore defaultDataStore];
 }
 
 + (void)removeDataStoreForProfile:(NSString *)profile completion:(void(^)(NSError * _Nullable))completion {
