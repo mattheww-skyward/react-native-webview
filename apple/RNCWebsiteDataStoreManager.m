@@ -3,7 +3,8 @@
 @implementation RNCWebsiteDataStoreManager
 /*
  Hold references to per-profile `WKWebsiteDataStore` instances in a 
- cache so the same store instance is reused across WebViews. This avoids races.
+ cache so the same store instance is reused across WebViews ensuring
+ auth tokens are persisted.
 */
 
 + (NSMutableDictionary<NSString *, WKWebsiteDataStore *> *)cache {
