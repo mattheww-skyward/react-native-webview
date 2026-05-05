@@ -8,6 +8,7 @@
 #import "RNCWebViewImpl.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
+#import "RNCWebsiteDataStoreManager.h"
 #import "RNCWKProcessPoolManager.h"
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
@@ -465,23 +466,19 @@ RCTAutoInsetsProtocol>
     websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
   }
   // Use profile-specific data store if profile is provided (iOS 17+)
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 170000 /* iOS 17 */
-    if (@available(iOS 17.0, macOS 14.0, *)) {
-        if (websiteDataStore == nil && _profile != nil) {
-            NSUUID *profileUUID = [[NSUUID alloc] initWithUUIDString:_profile];
-            if (profileUUID == nil) {
+  if (websiteDataStore == nil && _profile != nil) {
+    NSUUID *profileUUID = [[NSUUID alloc] initWithUUIDString:_profile];
+    if (profileUUID == nil) {
 #ifdef DEBUG
-                NSLog(@"Invalid profile value %@, should be GUID", _profile);
+      NSLog(@"Invalid profile value %@, should be GUID", _profile);
 #endif
-            } else {
+    } else {
 #ifdef DEBUG
-                NSLog(@"Setting profile to %@", _profile);
+      NSLog(@"Setting profile to %@", _profile);
 #endif
-                websiteDataStore = [WKWebsiteDataStore dataStoreForIdentifier:profileUUID];
-            }
-        }
+      websiteDataStore = [RNCWebsiteDataStoreManager dataStoreForProfileUUID:profileUUID];
     }
-#endif
+  }
   if (websiteDataStore == nil && _cacheEnabled) {
     websiteDataStore = [WKWebsiteDataStore defaultDataStore];
   }

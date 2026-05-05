@@ -25,6 +25,11 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec {
     }
 
     @Override
+    public void removeDataStore(String profile, Promise promise) {
+        mRNCWebViewModuleImpl.removeDataStore(profile, promise);
+    }
+
+    @Override
     public void shouldStartLoadWithLockIdentifier(boolean shouldStart, double lockIdentifier) {
         mRNCWebViewModuleImpl.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
     }
