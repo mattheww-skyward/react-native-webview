@@ -8,6 +8,7 @@
 #import "RNCWebViewImpl.h"
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
+#import "RNCWebsiteDataStoreManager.h"
 #import "RNCWKProcessPoolManager.h"
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
@@ -459,10 +460,30 @@ RCTAutoInsetsProtocol>
   if (_prefsUsed) {
     wkWebViewConfig.preferences = prefs;
   }
+  WKWebsiteDataStore *websiteDataStore;
+
   if (_incognito) {
-    wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
-  } else if (_cacheEnabled) {
-    wkWebViewConfig.websiteDataStore = [WKWebsiteDataStore defaultDataStore];
+    websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
+  }
+  // Use profile-specific data store if profile is provided (iOS 17+)
+  if (websiteDataStore == nil && _profile != nil) {
+    NSUUID *profileUUID = [[NSUUID alloc] initWithUUIDString:_profile];
+    if (profileUUID == nil) {
+#ifdef DEBUG
+      NSLog(@"Invalid profile value %@, should be GUID", _profile);
+#endif
+    } else {
+#ifdef DEBUG
+      NSLog(@"Setting profile to %@", _profile);
+#endif
+      websiteDataStore = [RNCWebsiteDataStoreManager dataStoreForProfileUUID:profileUUID];
+    }
+  }
+  if (websiteDataStore == nil && _cacheEnabled) {
+    websiteDataStore = [WKWebsiteDataStore defaultDataStore];
+  }
+  if (websiteDataStore != nil) {
+    wkWebViewConfig.websiteDataStore = websiteDataStore;
   }
   if(self.useSharedProcessPool) {
     wkWebViewConfig.processPool = [[RNCWKProcessPoolManager sharedManager] sharedProcessPool];

@@ -27,6 +27,11 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void removeDataStore(String profile, Promise promise) {
+        mRNCWebViewModuleImpl.removeDataStore(profile, promise);
+    }
+    
+    @ReactMethod
     public void shouldStartLoadWithLockIdentifier(boolean shouldStart, double lockIdentifier) {
         mRNCWebViewModuleImpl.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
     }

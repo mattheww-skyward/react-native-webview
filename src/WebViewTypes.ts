@@ -280,6 +280,13 @@ export interface BasicAuthCredential {
 export interface CommonNativeWebViewProps extends ViewProps {
   cacheEnabled?: boolean;
   incognito?: boolean;
+  /**
+   * A string identifier for the WebView profile.
+   * On Android, this uses WebViewCompat.getProfile() to get or create a named profile.
+   * On iOS, this is parsed as a UUID and uses WKWebsiteDataStore.dataStoreForIdentifier().
+   * @platform android, ios
+   */
+  profile?: string;
   injectedJavaScript?: string;
   injectedJavaScriptBeforeContentLoaded?: string;
   injectedJavaScriptForMainFrameOnly?: boolean;
@@ -386,6 +393,14 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * Does not store any data within the lifetime of the WebView.
    */
   incognito?: boolean;
+
+  /**
+   * A string identifier for the WebView profile.
+   * Parsed as a UUID and uses WKWebsiteDataStore.dataStoreForIdentifier() (iOS 17+).
+   * Mutually exclusive with incognito.
+   * @platform ios
+   */
+  profile?: string;
 
   /**
    * Boolean value that determines whether the web view bounces
@@ -775,6 +790,14 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
   incognito?: boolean;
 
   /**
+   * A string identifier for the WebView profile.
+   * Parsed as a UUID and uses WKWebsiteDataStore.dataStoreForIdentifier() (macOS 14+).
+   * Mutually exclusive with incognito.
+   * @platform macos
+   */
+  profile?: string;
+
+  /**
    * Boolean value that determines whether the web view bounces
    * when it reaches the edge of the content. The default value is `true`.
    * @platform macos
@@ -934,6 +957,21 @@ export interface MacOSWebViewProps extends WebViewSharedProps {
 }
 
 export interface AndroidWebViewProps extends WebViewSharedProps {
+  /**
+   * A string identifier for the WebView profile.
+   * Uses WebViewCompat.setProfile() to create a named profile (requires MULTI_PROFILE feature).
+   * Mutually exclusive with incognito.
+   * @platform android
+   */
+  profile?: string;
+
+  /**
+   * Does not store any data within the lifetime of the WebView.
+   * Mutually exclusive with profile.
+   * @platform android
+   */
+  incognito?: boolean;
+
   onNavigationStateChange?: (event: WebViewNavigation) => void;
   onContentSizeChange?: (event: WebViewEvent) => void;
 

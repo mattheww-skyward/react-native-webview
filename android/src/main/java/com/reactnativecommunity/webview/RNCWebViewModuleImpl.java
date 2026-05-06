@@ -17,6 +17,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.util.Pair;
+import androidx.webkit.WebViewFeature;
 
 import android.util.Log;
 import android.webkit.MimeTypeMap;
@@ -201,6 +202,32 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         return true;
     }
 
+    public void removeDataStore(String profile, Promise promise) {
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+            promise.resolve(true);
+            return;
+        }
+
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+            try {
+                androidx.webkit.ProfileStore profileStore = androidx.webkit.ProfileStore.getInstance();
+                androidx.webkit.Profile webViewProfile = profileStore.getProfile(profile);
+                if (webViewProfile != null) {
+                    webViewProfile.getWebStorage().deleteAllData();
+                    webViewProfile.getCookieManager().removeAllCookies(success -> {
+                        webViewProfile.getCookieManager().flush();
+                        promise.resolve(success);
+                    });
+                } else {
+                    promise.resolve(true);
+                }
+            } catch (Exception e) {
+                Log.e(NAME, "Failed to remove data store for profile: " + profile + ", error: ", e);
+                promise.resolve(false);
+            }
+        });
+    }
+    
     public void shouldStartLoadWithLockIdentifier(boolean shouldStart, double lockIdentifier) {
         final AtomicReference<ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState> lockObject = shouldOverrideUrlLoadingLock.getLock(lockIdentifier);
         if (lockObject != null) {

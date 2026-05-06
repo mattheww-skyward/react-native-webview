@@ -53,6 +53,7 @@ const WebViewComponent = forwardRef<unknown, MacOSWebViewProps>(
       allowsAirPlayForMediaPlayback,
       mediaPlaybackRequiresUserAction,
       incognito,
+      profile,
       onShouldStartLoadWithRequest: onShouldStartLoadWithRequestProp,
       ...otherProps
     },
@@ -119,7 +120,18 @@ const WebViewComponent = forwardRef<unknown, MacOSWebViewProps>(
     useWarnIfChanges(allowsPictureInPictureMediaPlayback, 'allowsPictureInPictureMediaPlayback');
     useWarnIfChanges(allowsAirPlayForMediaPlayback, 'allowsAirPlayForMediaPlayback');
     useWarnIfChanges(incognito, 'incognito');
-    useWarnIfChanges(mediaPlaybackRequiresUserAction, 'mediaPlaybackRequiresUserAction');
+    useWarnIfChanges(profile, 'profile');
+    useWarnIfChanges(
+      mediaPlaybackRequiresUserAction,
+      'mediaPlaybackRequiresUserAction'
+    );
+
+    // Warn if both incognito and profile are used together
+    if (incognito && profile) {
+      console.warn(
+        'incognito and profile props are mutually exclusive. profile will be ignored when incognito is true.'
+      );
+    }
 
     let otherView = null;
     if (viewState === 'LOADING') {
@@ -185,6 +197,7 @@ const WebViewComponent = forwardRef<unknown, MacOSWebViewProps>(
         allowsInlineMediaPlayback={allowsInlineMediaPlayback}
         allowsPictureInPictureMediaPlayback={allowsPictureInPictureMediaPlayback}
         incognito={incognito}
+        profile={profile}
         mediaPlaybackRequiresUserAction={mediaPlaybackRequiresUserAction}
         ref={webViewRef}
         // @ts-expect-error old arch only
