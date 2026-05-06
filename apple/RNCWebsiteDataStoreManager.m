@@ -17,19 +17,10 @@
     return dict;
 }
 
-+ (dispatch_queue_t)cacheQueue {
-    static dispatch_queue_t queue;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        queue = dispatch_queue_create("com.reactnativecommunity.webview.datastore", DISPATCH_QUEUE_SERIAL);
-    });
-    return queue;
-}
-
 + (WKWebsiteDataStore *)dataStoreForProfileUUID:(NSUUID * _Nullable)uuid {
     /*
      Return the profile-specific `WKWebsiteDataStore` when available (iOS 17+/macOS 14+).
-     Synchronously access the cache on `cacheQueue` to avoid races. 
+     @synchronized guards cache access to avoid races.
     */
     if (!uuid) {
         return [WKWebsiteDataStore defaultDataStore];
@@ -38,22 +29,23 @@
 #if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 170000) || \
     (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 140000)
     if (@available(iOS 17.0, macOS 14.0, *)) {
+#if DEBUG
+        NSAssert([NSThread isMainThread], @"dataStoreForProfileUUID: must be called on the main thread");
+#endif
         NSString *key = uuid.UUIDString;
-        __block WKWebsiteDataStore *result = nil;
-        dispatch_sync([self cacheQueue], ^{
-            NSMutableDictionary *cache = [self cache];
-            result = cache[key];
+        WKWebsiteDataStore *result = nil;
+        @synchronized([self cache]) {
+            WKWebsiteDataStore *result = [self cache][key];
             if (!result) {
                 result = [WKWebsiteDataStore dataStoreForIdentifier:uuid];
                 if (result) {
-                    cache[key] = result;
+                    [self cache][key] = result;
                 }
             }
-        });
+        }
         return result;
     }
 #endif
-
     return [WKWebsiteDataStore defaultDataStore];
 }
 
@@ -79,15 +71,22 @@
 
     if (@available(iOS 17.0, macOS 14.0, *)) {
         NSString *key = uuid.UUIDString;
-        WKWebsiteDataStore *store = [self dataStoreForProfileUUID:uuid];
-        NSSet *allTypes = [WKWebsiteDataStore allWebsiteDataTypes];
-        NSDate *epoch = [NSDate distantPast];
-        [store removeDataOfTypes:allTypes modifiedSince:epoch completionHandler:^{
-            dispatch_async([self cacheQueue], ^{
-                [[self cache] removeObjectForKey:key];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            WKWebsiteDataStore *store = [self dataStoreForProfileUUID:uuid];
+            if (!store) {
                 if (completion) completion(nil);
-            });
-        }];
+                return;
+            }
+
+            NSSet *allTypes = [WKWebsiteDataStore allWebsiteDataTypes];
+            NSDate *epoch = [NSDate distantPast];
+            [store removeDataOfTypes:allTypes modifiedSince:epoch completionHandler:^{
+                @synchronized([self cache]) {
+                    [[self cache] removeObjectForKey:key];
+                }
+                if (completion) completion(nil);
+            }];
+        });
     } else {
         if (completion) completion(nil);
     }
