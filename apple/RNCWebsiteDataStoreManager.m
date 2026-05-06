@@ -79,15 +79,22 @@
 
     if (@available(iOS 17.0, macOS 14.0, *)) {
         NSString *key = uuid.UUIDString;
-        WKWebsiteDataStore *store = [self dataStoreForProfileUUID:uuid];
-        NSSet *allTypes = [WKWebsiteDataStore allWebsiteDataTypes];
-        NSDate *epoch = [NSDate distantPast];
-        [store removeDataOfTypes:allTypes modifiedSince:epoch completionHandler:^{
-            dispatch_async([self cacheQueue], ^{
-                [[self cache] removeObjectForKey:key];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            WKWebsiteDataStore *store = [self dataStoreForProfileUUID:uuid];
+            if (!store) {
                 if (completion) completion(nil);
-            });
-        }];
+                return;
+            }
+
+            NSSet *allTypes = [WKWebsiteDataStore allWebsiteDataTypes];
+            NSDate *epoch = [NSDate distantPast];
+            [store removeDataOfTypes:allTypes modifiedSince:epoch completionHandler:^{
+                dispatch_async([self cacheQueue], ^{
+                    [[self cache] removeObjectForKey:key];
+                });
+                if (completion) completion(nil);
+            }];
+        });
     } else {
         if (completion) completion(nil);
     }
