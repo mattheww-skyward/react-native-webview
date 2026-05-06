@@ -29,15 +29,16 @@
 #if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 170000) || \
     (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 140000)
     if (@available(iOS 17.0, macOS 14.0, *)) {
+#if DEBUG
+        NSAssert([NSThread isMainThread], @"dataStoreForProfileUUID: must be called on the main thread");
+#endif
         NSString *key = uuid.UUIDString;
         WKWebsiteDataStore *result = nil;
         @synchronized([self cache]) {
-            result = [self cache][key];
-        }
-        if (!result) {
-            result = [WKWebsiteDataStore dataStoreForIdentifier:uuid];
-            if (result) {
-                @synchronized([self cache]) {
+            WKWebsiteDataStore *result = [self cache][key];
+            if (!result) {
+                result = [WKWebsiteDataStore dataStoreForIdentifier:uuid];
+                if (result) {
                     [self cache][key] = result;
                 }
             }
@@ -45,7 +46,6 @@
         return result;
     }
 #endif
-
     return [WKWebsiteDataStore defaultDataStore];
 }
 
