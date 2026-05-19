@@ -35,7 +35,7 @@
         NSString *key = uuid.UUIDString;
         WKWebsiteDataStore *result = nil;
         @synchronized([self cache]) {
-            WKWebsiteDataStore *result = [self cache][key];
+            result = [self cache][key];
             if (!result) {
                 result = [WKWebsiteDataStore dataStoreForIdentifier:uuid];
                 if (result) {
