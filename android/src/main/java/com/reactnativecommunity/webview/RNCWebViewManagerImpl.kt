@@ -1,6 +1,7 @@
 package com.reactnativecommunity.webview
 
 import android.app.DownloadManager
+import android.app.AlertDialog
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -490,21 +491,48 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
 
     fun setProfile(viewWrapper: RNCWebViewWrapper, profileName: String?) {
         val view = viewWrapper.webView
-        // Only set profile if the feature is available and profileName is provided
-        if (profileName != null && WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
-            try {
-                // Get or create a profile with the given name and associate it with the WebView
-                WebViewCompat.setProfile(view, profileName)
-            } catch (e: Exception) {
-                Log.w(TAG, "Failed to set WebView profile: ${e.message}")
+
+        if (profileName == null) {
+            Log.w(TAG, "WebView profile not set: profileName is null")
+            return
+        }
+
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+            val pkg = WebViewCompat.getCurrentWebViewPackage(view.context)
+            val providerName = when (pkg?.packageName) {
+                "com.google.android.webview" -> "Android System WebView"
+                "com.android.chrome" -> "Chrome"
+                else -> pkg?.packageName ?: "your system WebView"
             }
-        } else {
-            if (profileName == null) {
-                Log.w(TAG, "WebView profile not set: profileName is null")
-            }
-            if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
-                Log.w(TAG, "WebView profiles not supported on this device")
-            }
+            showUnsupportedProfileAlert(view, providerName)
+            return
+        }
+
+        try {
+            WebViewCompat.setProfile(view, profileName)
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to set WebView profile: ${e.message}")
+        }
+    }
+
+    private fun showUnsupportedProfileAlert(view: RNCWebView, providerName: String) {
+        val message = "This device does not support WebView profiles. Please update $providerName to a newer version."
+
+        val activity = view.themedReactContext.currentActivity
+        if (activity == null || activity.isFinishing) {
+            Log.w(TAG, message)
+            return
+        }
+
+        activity.runOnUiThread {
+            if (activity.isFinishing) return@runOnUiThread
+
+            AlertDialog.Builder(activity)
+                .setTitle("Update Required")
+                .setMessage(message)
+                .setPositiveButton("OK", null)
+                .setCancelable(false)
+                .show()
         }
     }
 
