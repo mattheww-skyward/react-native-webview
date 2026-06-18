@@ -1,7 +1,6 @@
 package com.reactnativecommunity.webview
 
 import android.app.DownloadManager
-import android.app.AlertDialog
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -498,13 +497,7 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
         }
 
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
-            val pkg = WebViewCompat.getCurrentWebViewPackage(view.context)
-            val providerName = when (pkg?.packageName) {
-                "com.google.android.webview" -> "Android System WebView"
-                "com.android.chrome" -> "Chrome"
-                else -> pkg?.packageName ?: "your system WebView"
-            }
-            showUnsupportedProfileAlert(view, providerName)
+            Log.w(TAG, "WebView profile not set: MULTI_PROFILE feature is not supported on this device")
             return
         }
 
@@ -512,27 +505,6 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
             WebViewCompat.setProfile(view, profileName)
         } catch (e: Exception) {
             Log.w(TAG, "Failed to set WebView profile: ${e.message}")
-        }
-    }
-
-    private fun showUnsupportedProfileAlert(view: RNCWebView, providerName: String) {
-        val message = "This device does not support WebView profiles. Please update $providerName to a newer version."
-
-        val activity = view.themedReactContext.currentActivity
-        if (activity == null || activity.isFinishing) {
-            Log.w(TAG, message)
-            return
-        }
-
-        activity.runOnUiThread {
-            if (activity.isFinishing) return@runOnUiThread
-
-            AlertDialog.Builder(activity)
-                .setTitle("Update Required")
-                .setMessage(message)
-                .setPositiveButton("OK", null)
-                .setCancelable(false)
-                .show()
         }
     }
 

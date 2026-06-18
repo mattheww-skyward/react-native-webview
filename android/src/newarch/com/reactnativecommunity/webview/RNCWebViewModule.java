@@ -25,6 +25,11 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec {
     }
 
     @Override
+    public void supportsProfiles(final Promise promise) {
+        promise.resolve(mRNCWebViewModuleImpl.unsupportedProfilesProviderName(getReactApplicationContext()));
+    }
+
+    @Override
     public void removeDataStore(String profile, Promise promise) {
         mRNCWebViewModuleImpl.removeDataStore(profile, promise);
     }
