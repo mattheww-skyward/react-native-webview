@@ -17,6 +17,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.util.Pair;
+import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import android.util.Log;
@@ -202,6 +203,24 @@ public class RNCWebViewModuleImpl implements ActivityEventListener {
         return true;
     }
 
+    @Nullable
+    public String unsupportedProfilesProviderName(Context context) {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+            return null;
+        }
+
+        android.content.pm.PackageInfo pkg = WebViewCompat.getCurrentWebViewPackage(context);
+        if (pkg == null) {
+            return "your system WebView";
+        }
+        
+        switch (pkg.packageName) {
+            case "com.google.android.webview": return "Android System WebView";
+            case "com.android.chrome":         return "Chrome";
+            default:                            return pkg.packageName;
+        }
+    }
+    
     public void removeDataStore(String profile, Promise promise) {
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
             promise.resolve(true);

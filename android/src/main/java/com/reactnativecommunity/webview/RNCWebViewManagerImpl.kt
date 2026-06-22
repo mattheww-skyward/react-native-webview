@@ -490,21 +490,21 @@ class RNCWebViewManagerImpl(private val newArch: Boolean = false) {
 
     fun setProfile(viewWrapper: RNCWebViewWrapper, profileName: String?) {
         val view = viewWrapper.webView
-        // Only set profile if the feature is available and profileName is provided
-        if (profileName != null && WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
-            try {
-                // Get or create a profile with the given name and associate it with the WebView
-                WebViewCompat.setProfile(view, profileName)
-            } catch (e: Exception) {
-                Log.w(TAG, "Failed to set WebView profile: ${e.message}")
-            }
-        } else {
-            if (profileName == null) {
-                Log.w(TAG, "WebView profile not set: profileName is null")
-            }
-            if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
-                Log.w(TAG, "WebView profiles not supported on this device")
-            }
+
+        if (profileName == null) {
+            Log.w(TAG, "WebView profile not set: profileName is null")
+            return
+        }
+
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+            Log.w(TAG, "WebView profile not set: MULTI_PROFILE feature is not supported on this device")
+            return
+        }
+
+        try {
+            WebViewCompat.setProfile(view, profileName)
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to set WebView profile: ${e.message}")
         }
     }
 

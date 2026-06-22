@@ -49,6 +49,20 @@
     return [WKWebsiteDataStore defaultDataStore];
 }
 
++ (NSString * _Nullable)unsupportedProfilesProviderName {
+#if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 170000) || \
+    (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 140000)
+    if (@available(iOS 17.0, macOS 14.0, *)) {
+        return nil;
+    }
+#endif
+#if TARGET_OS_OSX
+    return @"macOS";
+#else
+    return @"iOS";
+#endif
+}
+
 + (void)removeDataStoreForProfile:(NSString * _Nullable)profile completion:(void(^ _Nullable)(NSError * _Nullable))completion {
     if (!profile.length) {
         if (completion) {

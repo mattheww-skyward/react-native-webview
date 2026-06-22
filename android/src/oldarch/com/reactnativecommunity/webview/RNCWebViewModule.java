@@ -27,6 +27,11 @@ public class RNCWebViewModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void supportsProfiles(final Promise promise) {
+        promise.resolve(mRNCWebViewModuleImpl.unsupportedProfilesProviderName(getReactApplicationContext()));
+    }
+
+    @ReactMethod
     public void removeDataStore(String profile, Promise promise) {
         mRNCWebViewModuleImpl.removeDataStore(profile, promise);
     }
