@@ -18,6 +18,13 @@ RCT_EXPORT_METHOD(removeDataStore:(NSString *)profile resolve:(RCTPromiseResolve
   }];
 }
 
+RCT_EXPORT_METHOD(supportsProfiles:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+{
+  if (resolve) {
+    resolve([RNCWebsiteDataStoreManager unsupportedProfilesProviderName]);
+  }
+}
+
 RCT_EXPORT_METHOD(isFileUploadSupported:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   if (resolve) {
     resolve(@(YES));

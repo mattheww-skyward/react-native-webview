@@ -7,6 +7,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (WKWebsiteDataStore *)dataStoreForProfileUUID:(NSUUID * _Nullable)uuid;
 
++ (NSString * _Nullable)unsupportedProfilesProviderName;
+
 + (void)removeDataStoreForProfile:(NSString * _Nullable)profile completion:(void(^ _Nullable)(NSError * _Nullable))completion;
 
 @end
