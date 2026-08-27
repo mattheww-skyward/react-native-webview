@@ -16,6 +16,7 @@ import android.webkit.DownloadListener
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewCompat 
 import androidx.webkit.WebViewFeature
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
@@ -84,6 +85,8 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     private var mUserAgent: String? = null
     private var mUserAgentWithApplicationName: String? = null
+
+    private var mProfile: String? = null
 
     override fun getDelegate(): ViewManagerDelegate<RNCWebViewWrapper> = mDelegate
 
@@ -270,9 +273,10 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
 
     private fun setProfileInternal(viewWrapper: RNCWebViewWrapper) {
         val view = viewWrapper.webView
+        val profile = mProfile
 
-        if (mProfileName == null) {
-            Log.w(TAG, "WebView profile not set: mProfileName is null")
+        if (profile == null) {
+            Log.w(TAG, "WebView profile not set: mProfile is null")
             return
         }
 
@@ -282,7 +286,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         }
 
         try {
-            WebViewCompat.setProfile(view, mProfileName)
+            WebViewCompat.setProfile(view, profile)
         } catch (e: Exception) {
             Log.w(TAG, "Failed to set WebView profile: ${e.message}")
         }
