@@ -122,6 +122,7 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
 
     }
 
+
     protected static class ShouldOverrideUrlLoadingLock {
         protected enum ShouldOverrideCallbackState {
             UNDECIDED,
@@ -185,6 +186,11 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
         };
     }
 
+    @Override
+    public void supportsProfiles(final Promise promise) {
+        promise.resolve(unsupportedProfilesProviderName(getReactApplicationContext()));
+    }
+
     @Nullable
     public String unsupportedProfilesProviderName(Context context) {
         if (WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
@@ -203,6 +209,7 @@ public class RNCWebViewModule extends NativeRNCWebViewModuleSpec implements Acti
         }
     }
     
+    @Override
     public void removeDataStore(String profile, Promise promise) {
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
             promise.resolve(true);

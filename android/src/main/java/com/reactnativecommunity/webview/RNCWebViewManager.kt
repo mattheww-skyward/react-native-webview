@@ -268,6 +268,26 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         }
     }
 
+    private fun setProfileInternal(viewWrapper: RNCWebViewWrapper) {
+        val view = viewWrapper.webView
+
+        if (mProfileName == null) {
+            Log.w(TAG, "WebView profile not set: mProfileName is null")
+            return
+        }
+
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+            Log.w(TAG, "WebView profile not set: MULTI_PROFILE feature is not supported on this device")
+            return
+        }
+
+        try {
+            WebViewCompat.setProfile(view, mProfileName)
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to set WebView profile: ${e.message}")
+        }
+    }
+
     private fun getDownloadingMessageOrDefault(): String? {
         return mDownloadingMessage ?: DEFAULT_DOWNLOADING_MESSAGE
     }
@@ -664,6 +684,12 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
     override fun setUserAgent(view: RNCWebViewWrapper, value: String?) {
         mUserAgent = value
         setUserAgentString(view)
+    }
+
+    @ReactProp(name = "profile")
+    override fun setProfile(view: RNCWebViewWrapper, value: String?) {
+        mProfile = value
+        setProfileInternal(view)
     }
 
     /* iOS PROPS - not implemented here */
