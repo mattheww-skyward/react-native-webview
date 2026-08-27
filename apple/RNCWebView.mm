@@ -1,5 +1,3 @@
-// This guard prevent the code from being compiled in the old architecture
-#ifdef RCT_NEW_ARCH_ENABLED
 #import "RNCWebView.h"
 #import "RNCWebViewImpl.h"
 
@@ -72,13 +70,11 @@ static inline std::string nullSafeStringWithLength(id value) {
     return concreteComponentDescriptorProvider<RNCWebViewComponentDescriptor>();
 }
 
-#if !TARGET_OS_OSX
 // Reproduce the idea from here: https://github.com/facebook/react-native/blob/8bd3edec88148d0ab1f225d2119435681fbbba33/React/Fabric/Mounting/ComponentViews/InputAccessory/RCTInputAccessoryComponentView.mm#L142
 - (void)prepareForRecycle {
     [super prepareForRecycle];
     [_view destroyWebView];
 }
-#endif // !TARGET_OS_OSX
 
 // Needed because of this: https://github.com/facebook/react-native/pull/37274
 + (void)load
@@ -337,37 +333,40 @@ static inline std::string nullSafeStringWithLength(id value) {
     REMAP_WEBVIEW_PROP(removeIosKeyboardObserver)
     #endif // !TARGET_OS_OSX
 
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* __IPHONE_13_0 */
-    REMAP_WEBVIEW_PROP(automaticallyAdjustContentInsets)
-#endif
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000 /* iOS 14 */
+#if !TARGET_OS_OSX
+    REMAP_WEBVIEW_PROP(automaticallyAdjustsScrollIndicatorInsets)
     REMAP_WEBVIEW_PROP(limitsNavigationsToAppBoundDomains)
-#endif
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140500 /* iOS 14.5 */
     REMAP_WEBVIEW_PROP(textInteractionEnabled)
-#endif
+#endif // !TARGET_OS_OSX
 
 #if !TARGET_OS_OSX
     if (oldViewProps.dataDetectorTypes != newViewProps.dataDetectorTypes) {
+        // WKDataDetectorTypes is a bit mask: combine every requested type,
+        // mirroring the RCT_MULTI_ENUM_CONVERTER previously used on Paper.
         WKDataDetectorTypes dataDetectorTypes = WKDataDetectorTypeNone;
-            if (dataDetectorTypes & RNCWebViewDataDetectorTypes::Address) {
-                dataDetectorTypes |= WKDataDetectorTypeAddress;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::Link) {
-                dataDetectorTypes |= WKDataDetectorTypeLink;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::CalendarEvent) {
-                dataDetectorTypes |= WKDataDetectorTypeCalendarEvent;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::TrackingNumber) {
-                dataDetectorTypes |= WKDataDetectorTypeTrackingNumber;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::FlightNumber) {
-                dataDetectorTypes |= WKDataDetectorTypeFlightNumber;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::LookupSuggestion) {
-                dataDetectorTypes |= WKDataDetectorTypeLookupSuggestion;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::PhoneNumber) {
-                dataDetectorTypes |= WKDataDetectorTypePhoneNumber;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::All) {
-                dataDetectorTypes |= WKDataDetectorTypeAll;
-            } else if (dataDetectorTypes & RNCWebViewDataDetectorTypes::None) {
-                dataDetectorTypes = WKDataDetectorTypeNone;
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::Address) {
+            dataDetectorTypes |= WKDataDetectorTypeAddress;
+        }
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::Link) {
+            dataDetectorTypes |= WKDataDetectorTypeLink;
+        }
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::CalendarEvent) {
+            dataDetectorTypes |= WKDataDetectorTypeCalendarEvent;
+        }
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::TrackingNumber) {
+            dataDetectorTypes |= WKDataDetectorTypeTrackingNumber;
+        }
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::FlightNumber) {
+            dataDetectorTypes |= WKDataDetectorTypeFlightNumber;
+        }
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::LookupSuggestion) {
+            dataDetectorTypes |= WKDataDetectorTypeLookupSuggestion;
+        }
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::PhoneNumber) {
+            dataDetectorTypes |= WKDataDetectorTypePhoneNumber;
+        }
+        if (newViewProps.dataDetectorTypes & RNCWebViewDataDetectorTypes::All) {
+            dataDetectorTypes = WKDataDetectorTypeAll;
         }
         [_view setDataDetectorTypes:dataDetectorTypes];
     }
@@ -456,7 +455,7 @@ static inline std::string nullSafeStringWithLength(id value) {
         }
     }
 //
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
+#if !TARGET_OS_OSX
     if (oldViewProps.contentMode != newViewProps.contentMode) {
         if (newViewProps.contentMode == RNCWebViewContentMode::Recommended) {
             [_view setContentMode: WKContentModeRecommended];
@@ -466,9 +465,7 @@ static inline std::string nullSafeStringWithLength(id value) {
             [_view setContentMode:WKContentModeDesktop];
         }
     }
-#endif
 
-#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
     if (oldViewProps.mediaCapturePermissionGrantType != newViewProps.mediaCapturePermissionGrantType) {
         if (newViewProps.mediaCapturePermissionGrantType == RNCWebViewMediaCapturePermissionGrantType::Prompt) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_Prompt];
@@ -482,7 +479,7 @@ static inline std::string nullSafeStringWithLength(id value) {
             [_view setMediaCapturePermissionGrantType:RNCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny];
         }
     }
-#endif
+#endif // !TARGET_OS_OSX
     if (oldViewProps.indicatorStyle != newViewProps.indicatorStyle) {
         if (newViewProps.indicatorStyle == RNCWebViewIndicatorStyle::Black) {
             [_view setIndicatorStyle:@"black"];
@@ -568,7 +565,7 @@ Class<RCTComponentViewProtocol> RNCWebViewCls(void)
 }
 
 - (void)clearCache:(BOOL)includeDiskFiles {
-    // android only
+    [_view clearCache:includeDiskFiles];
 }
 
 - (void)clearHistory {
@@ -576,4 +573,3 @@ Class<RCTComponentViewProtocol> RNCWebViewCls(void)
 }
 
 @end
-#endif
