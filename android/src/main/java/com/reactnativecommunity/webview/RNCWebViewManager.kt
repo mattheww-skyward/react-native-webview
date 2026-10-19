@@ -144,7 +144,7 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
             try {
                 urlObj = URL(url)
                 val baseUrl = urlObj.protocol + "://" + urlObj.host
-                val cookie = CookieManager.getInstance().getCookie(baseUrl)
+                val cookie = getProfileCookieManager(webView).getCookie(baseUrl)
                 request.addRequestHeader("Cookie", cookie)
             } catch (e: MalformedURLException) {
                 Log.w(TAG, "Error getting cookie for DownloadManager", e)
@@ -290,6 +290,17 @@ open class RNCWebViewManager : ViewGroupManager<RNCWebViewWrapper>(),
         } catch (e: Exception) {
             Log.w(TAG, "Failed to set WebView profile: ${e.message}")
         }
+    }
+
+    // DownloadManager re-requests the file outside the WebView, so it needs the session cookies of the
+    // WebView's own profile. The default CookieManager only holds the default profile's cookies.
+    private fun getProfileCookieManager(view: WebView): CookieManager {
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+            return CookieManager.getInstance()
+        }
+
+        // Returns the default profile when no profile was set on this WebView
+        return WebViewCompat.getProfile(view).cookieManager
     }
 
     private fun getDownloadingMessageOrDefault(): String? {
